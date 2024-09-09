@@ -14,7 +14,7 @@ import json
 from io import BytesIO
 
 import folium
-from streamlit_folium import folium_static
+from streamlit_folium import folium_static, st_folium
 import streamlit as st
 
 import urllib.parse, urllib.request
@@ -162,7 +162,7 @@ def create_raster_layer(raster_bytes, dataset_name, downsample_data=True):
         # reproject data to EPSG:3857
         transform, width, height = calculate_default_transform(
             src_crs, 'EPSG:3857', src.width, src.height, *src.bounds)
-        # reprojected_data = np.empty((src.count, height, width), dtype=src.dtypes[0])
+        # reprojected_data = np.empty((src.count, height, width), dtype=src.dtypes [0])
 
         data = np.empty((height, width), dtype=src.dtypes[0])
         # reproject
@@ -249,7 +249,7 @@ def get_layer(dataset):
 def reset_map():
     ## what if we preloaded the datasets that we already have? 
     ## Add them here so the map is initialized with the datasets
-    map = folium.Map(location=[37.1661, -119.44944], zoom_start=4)   
+    map = folium.Map(location=[37.1661, -119.44944], zoom_start=4, width='100%', height='100%')   
     return map
 
 def update_map(dataset, map_placeholder, error_placeholder):
@@ -281,7 +281,8 @@ def update_map(dataset, map_placeholder, error_placeholder):
     if len(active_layers) > 1:
         folium.LayerControl().add_to(m)
     with map_placeholder:
-        folium_static(m)
+        # folium_static
+        st_folium(m, width='100%', height='100%')
     st.session_state.map = m
     with error_placeholder:
         for error_dataset in error_datasets:

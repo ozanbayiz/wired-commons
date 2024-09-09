@@ -31,8 +31,19 @@ st.markdown(
 st.markdown(
     """
     <style>
+            .leafletpcontainer {
+                width: 50vw;
+                height: 50fh;
+            }
+    </style>
+    """, 
+    unsafe_allow_html=True
+)
+st.markdown(
+    """
+    <style>
         section[data-testid="stSidebar"] {
-            width: 500px !important; # Set the width to your desired value
+            width: min(30vw, 500px) !important; # Set the width to your desired value
         }
     </style>
     """,
@@ -56,6 +67,7 @@ if 'map' not in st.session_state:
     st.session_state.map = m
     with map_placeholder:
         folium_static(st.session_state.map)
+        # st_folium(st.session_state.map)
     # also create cache to store existing layers for quicker loading
     # # Maybe can look into compressing somehow?
     st.session_state.cached_layers = {}
@@ -63,6 +75,7 @@ if 'map' not in st.session_state:
 else:
     with map_placeholder:
         folium_static(st.session_state.map)
+        # st_folium(st.session_state.map)
 
 error_placeholder = st.empty()
 
