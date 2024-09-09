@@ -21,4 +21,4 @@ Special thanks to Katie O'Laughlin for their guidance as I navigated the develop
   <img style="max-width: min(50vw, 1000px);" src="./assets/map-interface-demo.png" />
 </p>
 
-<p align="center"> <a href="wired-commons.streamlit.app">try it out!</a></p>
+<p align="center"> <a href="https://wired-commons.streamlit.app/">try it out!</a></p>

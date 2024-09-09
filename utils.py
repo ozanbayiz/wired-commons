@@ -20,8 +20,10 @@ import streamlit as st
 import urllib.parse, urllib.request
 import concurrent.futures
 
+## Create Vector Layers
+################################
 
-css_colors = [
+vector_colors = [
     "black", "silver", "gray", "white", "maroon", "red", "purple", "fuchsia", 
     "green", "lime", "olive", "yellow", "navy", "blue", "teal", "aqua", 
     "orange", "aliceblue", "antiquewhite", "aqua", "aquamarine", "azure", 
@@ -52,7 +54,6 @@ css_colors = [
     "snow", "springgreen", "steelblue", "tan", "thistle", "tomato", 
     "turquoise", "violet", "wheat", "whitesmoke", "yellowgreen"
 ]
-
 
 def fetch_all_features(base_url):
     # Get record extract limit
@@ -128,7 +129,7 @@ def create_vector_layer(geojson, dataset_title):
         st.error('Layer could not be fetched', icon="🚨")        
         return
     else:
-        layer_color = random.choice(css_colors)
+        layer_color = random.choice(vector_colors)
         style_function=lambda x: {
             'color':layer_color
         }
@@ -138,8 +139,6 @@ def create_vector_layer(geojson, dataset_title):
             style_function=style_function
         )
     return layer
-
-
 
 ## Create Raster Layers
 ################################
@@ -198,53 +197,53 @@ def create_raster_layer(raster_bytes, dataset_name, downsample_data=True):
         )
     return raster_layer
 
-def get_layer(dataset):
+def create_layer(dataset):
     dataset_id = dataset['id']
-    # use cached layer if exists
-    if dataset_id in st.session_state.cached_layers.keys():
-        layer = st.session_state.cached_layers[dataset_id]
+    layer = None
+    # OpenTopography
+    if dataset['owner_org'] == 'e2d487d1-6973-487c-bb20-a11744d9e1ea':
+        with st.spinner(f'fetching data for {dataset["title"]}'):
+            gdf = fetch_opentopo_geojson(dataset['url'])
+        with st.spinner(f'creating layer for {dataset["title"]}'):
+            layer = create_vector_layer(gdf, dataset['title'])
     else:
-        layer = None
-        if dataset['owner_org'] == 'e2d487d1-6973-487c-bb20-a11744d9e1ea': #OpenTopography
-            with st.spinner(f'fetching data for {dataset["title"]}'):
-                gdf = fetch_opentopo_geojson(dataset['url'])
-            with st.spinner(f'creating layer for {dataset["title"]}'):
-                layer = create_vector_layer(gdf, dataset['title'])
-        else:
-            for resource in dataset['resources']:
-                if resource['url']:
-                    # for FeatureServices
-                    if 'REST' in resource['format'] \
-                        and resource['url'][-1] in '0123456789': # make sure it's a valid Feature Service
-                        try:
-                            with st.spinner(f'fetching data for {dataset["title"]}'):
-                                gdf = fetch_all_features(resource['url'])
-                            with st.spinner(f'creating layer for {dataset["title"]}'):
-                                layer = create_vector_layer(gdf, dataset['title']) 
-                            break   
-                        except:
-                            st.error('Something went wrong :(')
-                            pass
-                    # for GeoJSONs
-                    elif resource['format'] == 'GeoJSON': 
+        for resource in dataset['resources']:
+            if resource['url']:
+                # for FeatureServices
+                print(resource['url'])
+                if 'REST' in resource['format'] \
+                    and resource['url'][-1] in '0123456789': # make sure it's a valid Feature Service
+                    try:
                         with st.spinner(f'fetching data for {dataset["title"]}'):
-                            geojson = fetch_geojson(resource['url'])
+                            gdf = fetch_all_features(resource['url'])
                         with st.spinner(f'creating layer for {dataset["title"]}'):
-                            layer = create_vector_layer(geojson, dataset['title'])
-                        break # only add one layer
-                    
-                    #For Raster Files
-                    elif resource['format'] == 'GeoTIFF' or resource['format'] == 'TIFF':
-                        with st.spinner(f'fetching data for {dataset["title"]}'):
-                            raster_bytes = fetch_raster_bytes(resource['url'])
-                        with st.spinner(f'creating layer for {dataset["title"]}'):
-                            layer = create_raster_layer(raster_bytes, dataset['title'])
-                        break # only add one layer
-        # cache new layer
-        if layer:
-            st.session_state.cached_layers[dataset_id] = layer
+                            layer = create_vector_layer(gdf, dataset['title']) 
+                        break   
+                    except:
+                        st.error('Something went wrong :(')
+                        pass
+                # for GeoJSONs
+                elif resource['format'] == 'GeoJSON': 
+                    with st.spinner(f'fetching data for {dataset["title"]}'):
+                        geojson = fetch_geojson(resource['url'])
+                    with st.spinner(f'creating layer for {dataset["title"]}'):
+                        layer = create_vector_layer(geojson, dataset['title'])
+                    break
+                #For Rasters
+                elif resource['format'] == 'GeoTIFF' or resource['format'] == 'TIFF':
+                    with st.spinner(f'fetching data for {dataset["title"]}'):
+                        raster_bytes = fetch_raster_bytes(resource['url'])
+                    with st.spinner(f'creating layer for {dataset["title"]}'):
+                        layer = create_raster_layer(raster_bytes, dataset['title'])
+                    break
+    # cache new layer
+    if layer:
+        st.session_state.cached_layers[dataset_id] = layer
     return layer
 
+
+## Map Helpers
+################################
 
 def reset_map():
     ## what if we preloaded the datasets that we already have? 
@@ -262,16 +261,19 @@ def update_map(dataset, map_placeholder, error_placeholder):
     st.session_state.active_layers = active_layers
 
     m = reset_map()
-    # add all layers to new map
-    error_datasets = []
+
     with error_placeholder:
         for dataset_id in active_layers:
-            layer = get_layer(active_layers[dataset_id])
-            if layer:
-                layer.add_to(m)
+            # check if layer already exists
+            if dataset_id in st.session_state.cached_layers.keys():
+                st.session_state.cached_layers[dataset_id].add_to(m)
             else:
-                error_datasets.append(dataset['title'])
-                st.error(f'Layer for {dataset['title']} could not be fetched', icon="🚨")
+                layer = create_layer(active_layers[dataset_id])
+                if layer:
+                    layer.add_to(m)
+                else:
+                    st.error(f'Layer for {dataset['title']} could not be fetched', icon="🚨")
+
     folium.plugins.Fullscreen(
         position='topright',
         title='Full Screen',
@@ -282,8 +284,5 @@ def update_map(dataset, map_placeholder, error_placeholder):
         folium.LayerControl().add_to(m)
     with map_placeholder:
         # folium_static
-        st_folium(m, width='100%', height='100%')
-    st.session_state.map = m
-    with error_placeholder:
-        for error_dataset in error_datasets:
-            st.error(f'Layer for {error_dataset} could not be fetched', icon="🚨")        
+        folium_static(m)
+    st.session_state.map = m     

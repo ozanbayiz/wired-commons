@@ -28,17 +28,7 @@ st.markdown(
     """, 
     unsafe_allow_html=True
 )
-st.markdown(
-    """
-    <style>
-            .leafletpcontainer {
-                width: 50vw;
-                height: 50fh;
-            }
-    </style>
-    """, 
-    unsafe_allow_html=True
-)
+
 st.markdown(
     """
     <style>
@@ -54,9 +44,7 @@ st.title('WIRED Map Interface')
 
 # The Map
 map_placeholder = st.empty()
-map_updated = False
 if 'map' not in st.session_state:  
-    # create and display new map
     m = reset_map()
     folium.plugins.Fullscreen(
             position='topright',
@@ -67,7 +55,6 @@ if 'map' not in st.session_state:
     st.session_state.map = m
     with map_placeholder:
         folium_static(st.session_state.map)
-        # st_folium(st.session_state.map)
     # also create cache to store existing layers for quicker loading
     # # Maybe can look into compressing somehow?
     st.session_state.cached_layers = {}
@@ -75,15 +62,14 @@ if 'map' not in st.session_state:
 else:
     with map_placeholder:
         folium_static(st.session_state.map)
-        # st_folium(st.session_state.map)
 
 error_placeholder = st.empty()
 
 # Sidebar
 with st.sidebar:
     st.write('information about data')
+    # search box
     search = st.text_input('Search WIFIRE Data Catalog')
-
     if (len(search) > 0 and 'search' not in st.session_state) \
             or ('search' in st.session_state and st.session_state.search != search):
         st.session_state.search = search
@@ -96,7 +82,7 @@ with st.sidebar:
             response = st.session_state.ckan.action.package_search(**params)
             st.session_state.search_results = response['results']
 
-    # Checkboxes
+    # checkboxes
     if 'search_results' in st.session_state:
         with st.expander("Search Results: ", expanded=True):
             result_list = {}
@@ -111,5 +97,5 @@ with st.sidebar:
                         args=(result, map_placeholder, error_placeholder)
                     )
                 with col2:
-                    st.link_button("View Metadata", url='https://wifire-data.sdsc.edu/dataset/' + result['id']) 
+                    st.link_button("View Metadata", url='https://wifire-data.sdsc.edu/dataset/'+result['id']) 
         st.session_state.result_list = result_list
