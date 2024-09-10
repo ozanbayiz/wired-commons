@@ -15,9 +15,9 @@ st.set_page_config(
     page_icon=im,
 )
 st._config.set_option("theme.primaryColor", "orchid")
-st._config.set_option("theme.backgroundColor", "0E1117")
-st._config.set_option("theme.secondaryBackgroundColor", "0E1117")
-st._config.set_option("theme.textColor", "FAFAFA")
+st._config.set_option("theme.backgroundColor", r"#0E1117")
+st._config.set_option("theme.secondaryBackgroundColor", r"#0E1117")
+st._config.set_option("theme.textColor", r"#FAFAFA")
 
 if 'ckan' not in st.session_state:
     st.session_state.ckan = RemoteCKAN('https://wifire-data.sdsc.edu/', apikey=os.environ['apiKey'])
