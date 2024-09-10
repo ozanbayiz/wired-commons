@@ -23,37 +23,62 @@ import concurrent.futures
 ## Create Vector Layers
 ################################
 
+# vector_colors = [
+#     "black", "silver", "gray", "white", "maroon", "red", "purple", "fuchsia", 
+#     "green", "lime", "olive", "yellow", "navy", "blue", "teal", "aqua", 
+#     "orange", "aliceblue", "antiquewhite", "aqua", "aquamarine", "azure", 
+#     "beige", "bisque", "blanchedalmond", "blueviolet", "brown", "burlywood", 
+#     "cadetblue", "chartreuse", "chocolate", "coral", "cornflowerblue", 
+#     "cornsilk", "crimson", "cyan", "darkblue", "darkcyan", "darkgoldenrod", 
+#     "darkgray", "darkgreen", "darkgrey", "darkkhaki", "darkmagenta", 
+#     "darkolivegreen", "darkorange", "darkorchid", "darkred", "darksalmon", 
+#     "darkseagreen", "darkslateblue", "darkslategray", "darkslategrey", 
+#     "darkturquoise", "darkviolet", "deeppink", "deepskyblue", "dimgray", 
+#     "dimgrey", "dodgerblue", "firebrick", "floralwhite", "forestgreen", 
+#     "gainsboro", "ghostwhite", "gold", "goldenrod", "greenyellow", 
+#     "greenyellow", "honeydew", "hotpink", "indianred", "indigo", "ivory", 
+#     "khaki", "lavender", "lavenderblush", "lawngreen", "lemonchiffon", 
+#     "lightblue", "lightcoral", "lightcyan", "lightgoldenrodyellow", 
+#     "lightgray", "lightgreen", "lightgrey", "lightpink", "lightsalmon", 
+#     "lightseagreen", "lightskyblue", "lightslategray", "lightslategrey", 
+#     "lightsteelblue", "lightyellow", "limegreen", "linen", "magenta", 
+#     "mediumaquamarine", "mediumblue", "mediumorchid", "mediumpurple", 
+#     "mediumseagreen", "mediumslateblue", "mediumspringgreen", 
+#     "mediumturquoise", "mediumvioletred", "midnightblue", "mintcream", 
+#     "mistyrose", "moccasin", "navajowhite", "oldlace", "olive", "olivedrab", 
+#     "orange", "orangered", "orchid", "palegoldenrod", "palegreen", 
+#     "paleturquoise", "palevioletred", "papayawhip", "peachpuff", 
+#     "peru", "pink", "plum", "powderblue", "rebeccapurple", "rosybrown", 
+#     "royalblue", "saddlebrown", "salmon", "sandybrown", "seagreen", 
+#     "seashell", "sienna", "skyblue", "slateblue", "slategray", "slategrey", 
+#     "snow", "springgreen", "steelblue", "tan", "thistle", "tomato", 
+#     "turquoise", "violet", "wheat", "whitesmoke", "yellowgreen"
+# ]
 vector_colors = [
-    "black", "silver", "gray", "white", "maroon", "red", "purple", "fuchsia", 
-    "green", "lime", "olive", "yellow", "navy", "blue", "teal", "aqua", 
-    "orange", "aliceblue", "antiquewhite", "aqua", "aquamarine", "azure", 
-    "beige", "bisque", "blanchedalmond", "blueviolet", "brown", "burlywood", 
-    "cadetblue", "chartreuse", "chocolate", "coral", "cornflowerblue", 
-    "cornsilk", "crimson", "cyan", "darkblue", "darkcyan", "darkgoldenrod", 
-    "darkgray", "darkgreen", "darkgrey", "darkkhaki", "darkmagenta", 
-    "darkolivegreen", "darkorange", "darkorchid", "darkred", "darksalmon", 
-    "darkseagreen", "darkslateblue", "darkslategray", "darkslategrey", 
-    "darkturquoise", "darkviolet", "deeppink", "deepskyblue", "dimgray", 
-    "dimgrey", "dodgerblue", "firebrick", "floralwhite", "forestgreen", 
-    "gainsboro", "ghostwhite", "gold", "goldenrod", "greenyellow", 
-    "greenyellow", "honeydew", "hotpink", "indianred", "indigo", "ivory", 
-    "khaki", "lavender", "lavenderblush", "lawngreen", "lemonchiffon", 
-    "lightblue", "lightcoral", "lightcyan", "lightgoldenrodyellow", 
-    "lightgray", "lightgreen", "lightgrey", "lightpink", "lightsalmon", 
-    "lightseagreen", "lightskyblue", "lightslategray", "lightslategrey", 
-    "lightsteelblue", "lightyellow", "limegreen", "linen", "magenta", 
-    "mediumaquamarine", "mediumblue", "mediumorchid", "mediumpurple", 
-    "mediumseagreen", "mediumslateblue", "mediumspringgreen", 
-    "mediumturquoise", "mediumvioletred", "midnightblue", "mintcream", 
-    "mistyrose", "moccasin", "navajowhite", "oldlace", "olive", "olivedrab", 
-    "orange", "orangered", "orchid", "palegoldenrod", "palegreen", 
-    "paleturquoise", "palevioletred", "papayawhip", "peachpuff", 
-    "peru", "pink", "plum", "powderblue", "rebeccapurple", "rosybrown", 
-    "royalblue", "saddlebrown", "salmon", "sandybrown", "seagreen", 
-    "seashell", "sienna", "skyblue", "slateblue", "slategray", "slategrey", 
-    "snow", "springgreen", "steelblue", "tan", "thistle", "tomato", 
-    "turquoise", "violet", "wheat", "whitesmoke", "yellowgreen"
+    "black", "maroon", "red", "purple", "fuchsia", 
+    "green", "lime", "olive", "yellow", "navy", "blue", 
+    "teal", "aqua", "orange", "aquamarine", "blueviolet", 
+    "brown", "chartreuse", "chocolate", "coral", "crimson", 
+    "cyan", "darkblue", "darkcyan", "darkgoldenrod", 
+    "darkgreen", "darkkhaki", "darkmagenta", "darkolivegreen", 
+    "darkorange", "darkorchid", "darkred", "darksalmon", 
+    "darkseagreen", "darkturquoise", "darkviolet", "deeppink", 
+    "deepskyblue", "dodgerblue", "firebrick", "forestgreen", 
+    "gold", "goldenrod", "greenyellow", "hotpink", "indianred", 
+    "indigo", "khaki", "lawngreen", "lightblue", "lightcoral", 
+    "lightpink", "lightsalmon", "lightseagreen", "lightskyblue", 
+    "limegreen", "magenta", "mediumaquamarine", "mediumblue", 
+    "mediumorchid", "mediumpurple", "mediumseagreen", 
+    "mediumslateblue", "mediumspringgreen", "mediumturquoise", 
+    "mediumvioletred", "midnightblue", "orange", "orangered", 
+    "orchid", "palegreen", "paleturquoise", "palevioletred", 
+    "peru", "pink", "plum", "powderblue", "rebeccapurple", 
+    "rosybrown", "royalblue", "saddlebrown", "salmon", 
+    "sandybrown", "seagreen", "sienna", "skyblue", "slateblue", 
+    "slategray", "springgreen", "steelblue", "tan", "thistle", 
+    "tomato", "turquoise", "violet", "yellowgreen"
 ]
+
 
 def fetch_all_features(base_url):
     # Get record extract limit
@@ -247,7 +272,7 @@ def create_layer(dataset):
 def reset_map():
     ## what if we preloaded the datasets that we already have? 
     ## Add them here so the map is initialized with the datasets
-    map = folium.Map(location=[37.1661, -119.44944], zoom_start=4, width='100%', height='100%')   
+    map = folium.Map(location=[37.1661, -119.44944], zoom_start=4, TileLayer="CartoDB Positron")   
     return map
 
 def update_map(dataset, map_placeholder, error_placeholder):
