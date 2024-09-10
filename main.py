@@ -69,21 +69,21 @@ data_tag_html = """
             margin: 0 auto;
             background-color: {0};
             border-radius: 20px;
-            border: 2px solid dark{0};
+            border: 1px solid #505158;
             font-size: 0.7em;
             text-align: center;
             color: white;
         ">{2}</div>
 """
 
-horizontal_line_html = '<hr style="border: none; border-top: 1px solid black; padding: 0; margin: 0;">'
+horizontal_line_html = '<hr style="border: none; border-top: 1px solid #505158; padding: 0; margin: 0;">'
 supported_filetypes = ["Esri REST","ArcGIS GeoServices REST API", "GeoJSON", "GeoTIFF", "TIFF"]
 filetype_colors = {
-    "Esri REST": "slategray",
-    "ArcGIS GeoServices REST API": "slateblue", 
-    "GeoJSON": "seagreen", 
-    "GeoTIFF": "purple", 
-    "TIFF": "violet"
+    "Esri REST": "darkslategray",
+    "ArcGIS GeoServices REST API": "darkslateblue", 
+    "GeoJSON": "darkseagreen", 
+    "GeoTIFF": "rebeccapurple", 
+    "TIFF": "blueviolet"
 }
 
 # Sidebar
