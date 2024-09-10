@@ -177,22 +177,6 @@ enableWebsocketCompression = false
 # Default: false
 enableStaticServing = false
 
-# Server certificate file for connecting via HTTPS.
-# Must be set at the same time as "server.sslKeyFile".
-# ['DO NOT USE THIS OPTION IN A PRODUCTION ENVIRONMENT. It has not gone through
-# security audits or performance tests. For the production environment, we
-# recommend performing SSL termination by the load balancer or the reverse
-# proxy.']
-#sslCertFile =
-
-# Cryptographic key file for connecting via HTTPS.
-# Must be set at the same time as "server.sslCertFile".
-# ['DO NOT USE THIS OPTION IN A PRODUCTION ENVIRONMENT. It has not gone through
-# security audits or performance tests. For the production environment, we
-# recommend performing SSL termination by the load balancer or the reverse
-# proxy.']
-#sslKeyFile =
-
 [browser]
 
 # Internet address where users should point their browsers in order to
@@ -220,14 +204,6 @@ gatherUsageStats = true
 # Default: whatever value is set in server.port.
 serverPort = 8501
 
-[mapbox]
-
-# Configure Streamlit to use a custom Mapbox
-# token for elements like st.pydeck_chart and st.map.
-# To get a token for yourself, create an account at
-# https://mapbox.com. It's free (for moderate usage levels)!
-# Default: ""
-token = ""
 
 [theme]
 base="dark"

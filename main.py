@@ -8,7 +8,9 @@ from dotenv import load_dotenv
 from utils import reset_map, update_map
 
 load_dotenv('.env')
-
+from PIL import Image
+im = Image.open("./assets/wired_logo.png")
+st.set_page_config(page_title="WIRED Commons", page_icon=im)
 if 'ckan' not in st.session_state:
     st.session_state.ckan = RemoteCKAN('https://wifire-data.sdsc.edu/', apikey=os.environ['apiKey'])
 
@@ -33,7 +35,7 @@ st.markdown(
     """
     <style>
         section[data-testid="stSidebar"] {
-            width: min(40vw, 500px) !important; # Set the width to your desired value
+            width: min(40vw, 500px)
         }
     </style>
     """,
@@ -63,7 +65,7 @@ else:
     with map_placeholder:
         folium_static(st.session_state.map)
 
-error_placeholder = st.empty()
+error_placeholder = st.container()
 data_tag_html = """
         <div style="
             margin: 0 auto;
@@ -73,12 +75,14 @@ data_tag_html = """
             font-size: 0.7em;
             text-align: center;
             color: white;
-        ">{2}</div>
+            width: auto;
+        ">{1}</div>
 """
 
 horizontal_line_html = '<hr style="border: none; border-top: 1px solid #505158; padding: 0; margin: 0;">'
-supported_filetypes = ["Esri REST","ArcGIS GeoServices REST API", "GeoJSON", "GeoTIFF", "TIFF"]
-filetype_colors = {
+
+supported_formats = ["Esri REST","ArcGIS GeoServices REST API", "GeoJSON", "GeoTIFF", "TIFF"]
+format_colors = {
     "Esri REST": "darkslategray",
     "ArcGIS GeoServices REST API": "darkslateblue", 
     "GeoJSON": "darkseagreen", 
@@ -88,14 +92,28 @@ filetype_colors = {
 
 # Sidebar
 with st.sidebar:
-    st.write("Also take a look at the [WIFIRE Commons Data Catalog](https://wifire-data.sdsc.edu/dataset).")
+    st.markdown("Check out the [WIFIRE Commons Data Catalog](https://wifire-data.sdsc.edu/dataset) for more info.")
     # search box
     search = st.text_input('Search WIFIRE Data Catalog')
+
+    #filters
+    with st.expander("Apply Filters"):
+        filter_formats = st.multiselect("Select Data Formats", supported_formats)
+        if not filter_formats:
+            filter_formats = supported_formats
+
     if (len(search) > 0 and 'search' not in st.session_state) \
-            or ('search' in st.session_state and st.session_state.search != search):
+            or ('search' in st.session_state and st.session_state.search != search) \
+            or ('filter_formats' in st.session_state and filter_formats != st.session_state.filter_formats):
+        
         st.session_state.search = search
+        st.session_state.filter_formats = filter_formats
+
+        format_query = f'res_format:"{filter_formats[0]}"'
+        for format in filter_formats:
+            format_query+=f' OR res_format:"{format}"'
         params = {
-            'q':f'title:"{search}" AND (res_format:"Esri REST" OR res_format:"ArcGIS GeoServices REST API" OR res_format:GeoJSON OR res_format:GeoTIFF OR res_format:TIFF)',
+            'q':f'title:"{search}" AND ({format_query})',
             'start': 0,
             'rows': 100
         }
@@ -111,14 +129,16 @@ with st.sidebar:
                     col1, col2 = st.columns([2,1])
                     with col1:
                         st.markdown(horizontal_line_html, unsafe_allow_html=True)
-                        for resource in result['resources']:
-                            if resource['format'] in supported_filetypes:
-                                format = resource['format']
-                                st.markdown(
-                                    data_tag_html.format(filetype_colors[format], filetype_colors[format], format),
-                                    unsafe_allow_html=True
-                                )
-                                break
+                        with st.container():
+                            dataset_formats = []
+                            for resource in result['resources']:
+                                if resource['format'] in supported_formats and resource['format'] not in dataset_formats:
+                                    format = resource['format']
+                                    dataset_formats.append(format)
+                                    st.markdown(
+                                        data_tag_html.format(format_colors[format], format),
+                                        unsafe_allow_html=True
+                                    )
                         result_list[result['id']] = st.checkbox(
                             result['title'], 
                             key=result['id'], 
@@ -128,8 +148,9 @@ with st.sidebar:
                         )
                     with col2:
                         st.markdown(horizontal_line_html, unsafe_allow_html=True)
-                        st.markdown("<div></div>", unsafe_allow_html=True)
+                        for i in range(len(dataset_formats)): #naive, padding
+                            st.markdown("<div></div>", unsafe_allow_html=True)
                         st.link_button("View Metadata", url='https://wifire-data.sdsc.edu/dataset/'+result['id']) 
             else:
-                st.write("No results found.")
+                st.write("No results found. Maybe there's a typo?")
         st.session_state.result_list = result_list
