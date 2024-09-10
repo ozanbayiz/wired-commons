@@ -16,7 +16,7 @@ st.set_page_config(
 )
 st._config.set_option("theme.primaryColor", "orchid")
 st._config.set_option("theme.backgroundColor", r"#0E1117")
-st._config.set_option("theme.secondaryBackgroundColor", r"#0E1117")
+st._config.set_option("theme.secondaryBackgroundColor", r"#262730")
 st._config.set_option("theme.textColor", r"#FAFAFA")
 
 if 'ckan' not in st.session_state:
