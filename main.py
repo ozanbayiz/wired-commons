@@ -10,7 +10,15 @@ from utils import reset_map, update_map
 load_dotenv('.env')
 from PIL import Image
 im = Image.open("./assets/wired_logo.png")
-st.set_page_config(page_title="WIRED Commons", page_icon=im)
+st.set_page_config(
+    page_title="WIRED Commons",
+    page_icon=im,
+)
+st._config.set_option("theme.primaryColor", "orchid")
+st._config.set_option("theme.backgroundColor", "0E1117")
+st._config.set_option("theme.secondaryBackgroundColor", "0E1117")
+st._config.set_option("theme.textColor", "FAFAFA")
+
 if 'ckan' not in st.session_state:
     st.session_state.ckan = RemoteCKAN('https://wifire-data.sdsc.edu/', apikey=os.environ['apiKey'])
 
