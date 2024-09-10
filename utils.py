@@ -210,17 +210,17 @@ def create_layer(dataset):
         for resource in dataset['resources']:
             if resource['url']:
                 # for FeatureServices
-                if 'REST' in resource['format'] \
-                    and resource['url'][-1] in '0123456789': # make sure it's a valid Feature Service
-                    try:
-                        with st.spinner(f'fetching data for {dataset["title"]}'):
-                            gdf = fetch_all_features(resource['url'])
-                        with st.spinner(f'creating layer for {dataset["title"]}'):
-                            layer = create_vector_layer(gdf, dataset['title']) 
-                        break   
-                    except:
-                        st.error('Something went wrong :(')
-                        pass
+                if 'REST' in resource['format']:
+                    if resource['url'][-1] in '0123456789': # make sure it's a valid Feature Service
+                        try:
+                            with st.spinner(f'fetching data for {dataset["title"]}'):
+                                gdf = fetch_all_features(resource['url'])
+                            with st.spinner(f'creating layer for {dataset["title"]}'):
+                                layer = create_vector_layer(gdf, dataset['title']) 
+                            break   
+                        except:
+                            st.error('Something went wrong :(')
+                            pass
                 # for GeoJSONs
                 elif resource['format'] == 'GeoJSON': 
                     with st.spinner(f'fetching data for {dataset["title"]}'):
