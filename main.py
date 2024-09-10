@@ -88,7 +88,7 @@ filetype_colors = {
 
 # Sidebar
 with st.sidebar:
-    st.write("Also take a look at the WIFIRE Commons Data Catalog](https://wifire-data.sdsc.edu/dataset).")
+    st.write("Also take a look at the [WIFIRE Commons Data Catalog](https://wifire-data.sdsc.edu/dataset).")
     # search box
     search = st.text_input('Search WIFIRE Data Catalog')
     if (len(search) > 0 and 'search' not in st.session_state) \
