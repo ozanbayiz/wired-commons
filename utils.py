@@ -95,7 +95,7 @@ def fetch_all_features(base_url):
             gdf = gpd.GeoDataFrame.from_features(data['features'], crs='EPSG:4326')
             gdf['geometry'] = (
                 gdf['geometry']
-                .simplify(tolerance=0.01, preserve_topology=True) # lower resolution
+                .simplify(tolerance=0.05, preserve_topology=True) # lower resolution
                 .buffer(0) # fix invalid geometries
             )
             return gdf
@@ -210,7 +210,6 @@ def create_layer(dataset):
         for resource in dataset['resources']:
             if resource['url']:
                 # for FeatureServices
-                print(resource['url'])
                 if 'REST' in resource['format'] \
                     and resource['url'][-1] in '0123456789': # make sure it's a valid Feature Service
                     try:

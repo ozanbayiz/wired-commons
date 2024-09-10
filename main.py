@@ -33,7 +33,7 @@ st.markdown(
     """
     <style>
         section[data-testid="stSidebar"] {
-            width: min(30vw, 500px) !important; # Set the width to your desired value
+            width: min(40vw, 500px) !important; # Set the width to your desired value
         }
     </style>
     """,
@@ -64,10 +64,31 @@ else:
         folium_static(st.session_state.map)
 
 error_placeholder = st.empty()
+data_tag_html = """
+        <div style="
+            margin: 0 auto;
+            background-color: {0};
+            border-radius: 20px;
+            border: 2px solid dark{0};
+            font-size: 0.7em;
+            text-align: center;
+            color: white;
+        ">{2}</div>
+"""
+
+horizontal_line_html = '<hr style="border: none; border-top: 1px solid black; padding: 0; margin: 0;">'
+supported_filetypes = ["Esri REST","ArcGIS GeoServices REST API", "GeoJSON", "GeoTIFF", "TIFF"]
+filetype_colors = {
+    "Esri REST": "slategray",
+    "ArcGIS GeoServices REST API": "slateblue", 
+    "GeoJSON": "seagreen", 
+    "GeoTIFF": "purple", 
+    "TIFF": "violet"
+}
 
 # Sidebar
 with st.sidebar:
-    st.write('information about data')
+    st.write("Learn about the [WIFIRE Commons Data Catalog](https://wifire-data.sdsc.edu/dataset)")
     # search box
     search = st.text_input('Search WIFIRE Data Catalog')
     if (len(search) > 0 and 'search' not in st.session_state) \
@@ -81,21 +102,34 @@ with st.sidebar:
         with st.spinner('searching WIFIRE Data Catalog'):
             response = st.session_state.ckan.action.package_search(**params)
             st.session_state.search_results = response['results']
-
     # checkboxes
     if 'search_results' in st.session_state:
         with st.expander("Search Results: ", expanded=True):
             result_list = {}
-            for result in st.session_state.search_results:
-                col1, col2 = st.columns([2,1])
-                with col1:
-                    result_list[result['id']] = st.checkbox(
-                        result['title'], 
-                        key=result['id'], 
-                        value=(result['id'] in st.session_state.active_layers),
-                        on_change=update_map,
-                        args=(result, map_placeholder, error_placeholder)
-                    )
-                with col2:
-                    st.link_button("View Metadata", url='https://wifire-data.sdsc.edu/dataset/'+result['id']) 
+            if st.session_state.search_results:
+                for result in st.session_state.search_results:
+                    col1, col2 = st.columns([2,1])
+                    with col1:
+                        st.markdown(horizontal_line_html, unsafe_allow_html=True)
+                        for resource in result['resources']:
+                            if resource['format'] in supported_filetypes:
+                                format = resource['format']
+                                st.markdown(
+                                    data_tag_html.format(filetype_colors[format], filetype_colors[format], format),
+                                    unsafe_allow_html=True
+                                )
+                                break
+                        result_list[result['id']] = st.checkbox(
+                            result['title'], 
+                            key=result['id'], 
+                            value=(result['id'] in st.session_state.active_layers),
+                            on_change=update_map,
+                            args=(result, map_placeholder, error_placeholder)
+                        )
+                    with col2:
+                        st.markdown(horizontal_line_html, unsafe_allow_html=True)
+                        st.markdown("<div></div>", unsafe_allow_html=True)
+                        st.link_button("View Metadata", url='https://wifire-data.sdsc.edu/dataset/'+result['id']) 
+            else:
+                st.write("No results found.")
         st.session_state.result_list = result_list
