@@ -120,7 +120,7 @@ def fetch_all_features(base_url):
             gdf = gpd.GeoDataFrame.from_features(data['features'], crs='EPSG:4326')
             gdf['geometry'] = (
                 gdf['geometry']
-                .simplify(tolerance=0.05, preserve_topology=True) # lower resolution
+                .simplify(tolerance=0.025, preserve_topology=True) # lower resolution
                 .buffer(0) # fix invalid geometries
             )
             return gdf
