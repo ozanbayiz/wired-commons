@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 from utils import reset_map, update_map
 
 load_dotenv('.env')
+
+# these only need to be run once
 from PIL import Image
 im = Image.open("./assets/wired_logo.png")
 st.set_page_config(
@@ -65,8 +67,6 @@ if 'map' not in st.session_state:
     st.session_state.map = m
     with map_placeholder:
         folium_static(st.session_state.map)
-    # also create cache to store existing layers for quicker loading
-    # # Maybe can look into compressing somehow?
     st.session_state.cached_layers = {}
     st.session_state.active_layers = {}
 else:
@@ -104,7 +104,7 @@ with st.sidebar:
     # search box
     search = st.text_input('Search WIFIRE Data Catalog')
 
-    #filters
+    #filter box
     with st.expander("Apply Filters"):
         filter_formats = st.multiselect("Select Data Formats", supported_formats)
         if not filter_formats:
@@ -128,15 +128,18 @@ with st.sidebar:
         with st.spinner('searching WIFIRE Data Catalog'):
             response = st.session_state.ckan.action.package_search(**params)
             st.session_state.search_results = response['results']
-    # checkboxes
     if 'search_results' in st.session_state:
         with st.expander("Search Results: ", expanded=True):
             result_list = {}
             if st.session_state.search_results:
                 for result in st.session_state.search_results:
                     col1, col2 = st.columns([2,1])
+                    # maybe horizontal line can go outside of columns? but I kind of like how it's split
+                    
                     with col1:
                         st.markdown(horizontal_line_html, unsafe_allow_html=True)
+                        
+                        # data format labels
                         with st.container():
                             dataset_formats = []
                             for resource in result['resources']:
@@ -147,6 +150,8 @@ with st.sidebar:
                                         data_tag_html.format(format_colors[format], format),
                                         unsafe_allow_html=True
                                     )
+
+                        # checkbox
                         result_list[result['id']] = st.checkbox(
                             result['title'], 
                             key=result['id'], 
@@ -154,9 +159,10 @@ with st.sidebar:
                             on_change=update_map,
                             args=(result, map_placeholder, error_placeholder)
                         )
+
                     with col2:
                         st.markdown(horizontal_line_html, unsafe_allow_html=True)
-                        for i in range(len(dataset_formats)): #naive, padding
+                        for i in range(len(dataset_formats)): #naive padding
                             st.markdown("<div></div>", unsafe_allow_html=True)
                         st.link_button("View Metadata", url='https://wifire-data.sdsc.edu/dataset/'+result['id']) 
             else:
